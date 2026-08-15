@@ -1,65 +1,30 @@
-# Automia Labs — formularios y kits gratuitos
+# Automia Labs — Email, Diagnóstico y Kits
 
-La web ya tenía los formularios como demo. Esta versión los conecta a dos endpoints reales:
+## Variables de entorno
+Copia `.env.example` a `.env.local` y completa `RESEND_API_KEY`.
 
-- `POST /api/diagnostico`
-- `POST /api/recursos`
+- `RESEND_API_KEY`: clave privada de Resend.
+- `LEADS_TO_EMAIL`: Gmail donde recibes los leads.
+- `EMAIL_FROM`: inicialmente `onboarding@resend.dev`.
+- `NEXT_PUBLIC_SITE_URL`: `https://automia-labs.vercel.app`.
 
-No se necesita `nodemailer` ni añadir una dependencia: los endpoints usan la API HTTP de Resend.
-
-## 1. Variables de entorno
-
-Crea un archivo `.env.local` en desarrollo:
-
-```env
-RESEND_API_KEY=re_xxxxxxxxx
-LEADS_TO=tuemail@gmail.com
-EMAIL_FROM=Automia Labs <onboarding@resend.dev>
-NEXT_PUBLIC_SITE_URL=https://automialabs.com
+## Desarrollo
+Este proyecto usa PNPM:
+```bash
+pnpm install
+pnpm dev
 ```
 
-En Vercel añade exactamente las mismas variables en Project Settings → Environment Variables.
+## Resend y el dominio Vercel
+`https://automia-labs.vercel.app` sirve como URL pública para enlaces y descargas, pero **no puede usarse como dominio remitente de Resend** porque no es un dominio que controles. Mientras no verifiques un dominio propio en Resend, la cuenta está limitada a destinatarios de prueba (tu propia dirección).
 
-### Producción
+Por eso el sistema:
+1. Registra y notifica los leads a `LEADS_TO_EMAIL`.
+2. Entrega el PDF inmediatamente desde la web a cualquier usuario.
+3. Cuando verifiques un dominio propio en Resend, podrás cambiar `EMAIL_FROM` a `hola@tu-dominio` y activar correos automáticos a cualquier usuario.
 
-Cuando tengas el dominio de Automia Labs verificado en Resend, cambia:
+## Endpoints
+- `POST /api/diagnostico` — registra un diagnóstico y envía un email HTML al inbox.
+- `POST /api/recursos` — registra una solicitud de kit y devuelve una URL de descarga inmediata.
 
-```env
-EMAIL_FROM=Automia Labs <hola@automialabs.com>
-```
-
-`LEADS_TO` puede seguir siendo tu Gmail personal/provisional. No hace falta que el correo receptor sea de Google Workspace.
-
-## 2. Kits gratuitos
-
-Los PDFs públicos se colocan en:
-
-`public/recursos/`
-
-Por ejemplo:
-
-`public/recursos/guia-automatizacion.pdf`
-
-La URL pública será:
-
-`https://automialabs.com/recursos/guia-automatizacion.pdf`
-
-Para añadir otro kit, crea el PDF y añade una entrada en `lib/resources.ts`.
-
-## 3. Flujo del diagnóstico
-
-Cliente → `/api/diagnostico` → correo a `LEADS_TO` + confirmación al cliente.
-
-El email enviado a Automia Labs usa `reply_to` con el correo del potencial cliente, así que desde Gmail puedes pulsar Responder y contestarle directamente.
-
-## 4. Flujo de recursos
-
-Cliente → `/api/recursos` → recibe el enlace del kit por email + Automia Labs recibe aviso del nuevo lead.
-
-## 5. Importante
-
-Los endpoints no guardan los datos en una base de datos todavía. El correo funciona como bandeja de entrada inicial de leads.
-
-Cuando el volumen crezca, el siguiente paso recomendable será conectar los leads a un CRM/Google Sheets y automatizar seguimiento.
-
-No pongas `RESEND_API_KEY` dentro del código ni la subas a GitHub.
+Los emails incluyen `Reply-To` del lead y botones de respuesta por email/WhatsApp cuando el teléfono fue proporcionado.

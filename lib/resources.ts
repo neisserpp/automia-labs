@@ -1,21 +1,19 @@
 export type Resource = {
+  slug: string
   title: string
   description: string
-  path: string
+  filePath: string
 }
 
 export const resources: Record<string, Resource> = {
-  'guia-automatizacion': {
-    title: 'Guía gratuita de automatización con IA',
-    description:
-      'Una guía práctica para detectar tareas repetitivas y encontrar oportunidades de automatización en tu negocio.',
-    path: '/recursos/guia-automatizacion.pdf',
+  'kit-automatizaciones-pymes': {
+    slug: 'kit-automatizaciones-pymes',
+    title: '10 automatizaciones con IA que una PYME puede implementar',
+    description: 'Kit práctico para detectar tareas repetitivas y oportunidades de automatización.',
+    filePath: '/recursos/kit-10-automatizaciones-ia-para-pymes.pdf',
   },
+}
 
-  // Añade aquí futuros kits:
-  // 'kit-inmobiliarias': {
-  //   title: 'Kit de automatización para inmobiliarias',
-  //   description: 'Flujos y plantillas para captar y seguir leads.',
-  //   path: '/recursos/kit-inmobiliarias.pdf',
-  // },
+export function getResource(slug: string) {
+  return resources[slug] ?? null
 }
