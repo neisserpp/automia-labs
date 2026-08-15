@@ -21,7 +21,7 @@ const resourceMeta: Record<string, { title: string; description: string; file: s
   'sistema-captacion-automatica': { title: 'Sistema de Captación Automática', description: 'Convierte contactos de web, Instagram y WhatsApp en oportunidades cualificadas.', file: '/recursos/sistema-captacion-automatica.pdf' },
   'sistema-atencion-automatica': { title: 'Sistema de Atención Automática', description: 'Reduce preguntas repetitivas y deriva a una persona cuando haga falta.', file: '/recursos/sistema-atencion-automatica.pdf' },
   'sistema-recuperacion-clientes': { title: 'Sistema de Recuperación de Clientes', description: 'Reabre conversaciones con oportunidades que se quedaron a medias.', file: '/recursos/sistema-recuperacion-clientes.pdf' },
-  'kit-automatizaciones-pymes': { title: '10 automatizaciones con IA para PYMEs', description: 'Una guía general para descubrir qué procesos puedes automatizar.', file: '/recursos/kit-10-automatizaciones-ia-para-pymes.pdf' },
+  'kit-automatizaciones-pymes': { title: 'Guía práctica: automatización con IA para optimizar tu negocio', description: 'Una guía completa para detectar oportunidades y empezar a automatizar con criterio.', file: '/recursos/guia-practica-automatizacion-ia-para-negocios.pdf' },
 }
 
 export function ResourceAdvisor() {

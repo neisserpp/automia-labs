@@ -28,3 +28,7 @@ No se utiliza una IA externa para decidir el PDF todavía. Las reglas son determ
 ## Resend
 
 Mientras el dominio propio no esté verificado en Resend, los leads se notifican a `LEADS_TO_EMAIL` y el usuario descarga el recurso directamente desde Vercel. Cuando haya un dominio verificado, se puede activar la entrega automática por email cambiando `EMAIL_FROM` y añadiendo el envío al usuario.
+
+
+## Nueva estrategia de recursos
+La guía general ahora funciona como recurso de entrada y el formulario de lead magnet pregunta el principal reto para recomendar un recurso especializado. Se añadió `public/recursos/guia-practica-automatizacion-ia-para-negocios.pdf`.

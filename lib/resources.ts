@@ -13,9 +13,9 @@ export type Resource = {
 export const resources: Record<string, Resource> = {
   'kit-automatizaciones-pymes': {
     slug: 'kit-automatizaciones-pymes',
-    title: '10 automatizaciones con IA que una PYME puede implementar',
-    description: 'Kit práctico para detectar tareas repetitivas y oportunidades de automatización.',
-    filePath: '/recursos/kit-10-automatizaciones-ia-para-pymes.pdf',
+    title: 'Guía práctica: automatización con IA para optimizar tu negocio',
+    description: 'Guía completa para entender ventajas, oportunidades, riesgos y primeros pasos de automatización con IA.',
+    filePath: '/recursos/guia-practica-automatizacion-ia-para-negocios.pdf',
     problem: 'general',
     tags: ['no sé qué automatizar', 'automatización', 'ia', 'productividad'],
     cta: 'Descubrir oportunidades',
