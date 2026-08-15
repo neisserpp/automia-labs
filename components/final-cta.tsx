@@ -22,7 +22,7 @@ export function FinalCTA() {
               <p className="max-w-xl text-base text-muted-foreground text-pretty md:text-lg">
                 Cuéntanos qué tarea te está haciendo perder tiempo.
               </p>
-              <CTALink href="/contacto" size="lg" className="mt-2">
+              <CTALink href="/diagnostico" size="lg" className="mt-2">
                 Hablar con Automia Labs
                 <ArrowRight className="h-4 w-4" />
               </CTALink>
