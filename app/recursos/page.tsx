@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { SiteShell } from '@/components/site-shell'
 import { PageHero } from '@/components/page-hero'
-import { LeadMagnet } from '@/components/lead-magnet'
+import { ResourceAdvisor } from '@/components/resource-advisor'
 import { FAQ } from '@/components/faq'
 import { FinalCTA } from '@/components/final-cta'
 
@@ -22,9 +22,9 @@ export default function RecursosPage() {
             Aprende a <span className="text-gradient">automatizar tu negocio</span>
           </>
         }
-        description="Guías, ideas y respuestas para empezar a ahorrar tiempo con automatización e inteligencia artificial, aunque partas de cero."
+        description="Encuentra el recurso adecuado según el problema real de tu negocio y descubre por dónde empezar con automatización e inteligencia artificial."
       />
-      <LeadMagnet />
+      <ResourceAdvisor />
       <FAQ />
       <FinalCTA />
     </SiteShell>

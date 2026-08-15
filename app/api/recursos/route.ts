@@ -19,7 +19,11 @@ export async function POST(request: Request) {
     const phone = clean(body.phone, 40)
     const resourceSlug = clean(body.resource, 100) || 'kit-automatizaciones-pymes'
     const consent = body.consent === true || body.consent === 'true'
+    const problem = clean(body.problem, 80) || 'general'
+    const sector = clean(body.sector, 120)
+    const urgency = clean(body.urgency, 80)
     const resource = getResource(resourceSlug)
+    const score = urgency === 'ahora' ? 90 : urgency === '30-dias' ? 65 : 35
 
     if (!name || !email || !email.includes('@') || !business || !resource || !consent) {
       return NextResponse.json({ ok: false, error: 'Completa los campos obligatorios y acepta el consentimiento.' }, { status: 400 })
@@ -35,7 +39,7 @@ export async function POST(request: Request) {
       subject: `Nuevo lead · ${resource.title} · ${name}`,
       html: layout('Nuevo lead de recurso', `Nueva descarga solicitada por ${name}`, `
         <p style="font-size:16px;color:#dce3ef;margin-top:0">Alguien ha solicitado un recurso gratuito.</p>
-        <table style="width:100%;border-collapse:collapse">${row('Nombre',name)}${row('Email',email)}${row('Negocio',business)}${row('Teléfono',phone || '—')}${row('Recurso',resource.title)}</table>
+        <table style="width:100%;border-collapse:collapse">${row('Nombre',name)}${row('Email',email)}${row('Negocio',business)}${row('Teléfono',phone || '—')}${row('Recurso recomendado',resource.title)}${row('Problema detectado',problem)}${row('Sector',sector || '—')}${row('Urgencia',urgency || '—')}${row('Lead score',`${score}/100`)} </table>
         <div style="margin-top:22px">${wa ? `<a href="${wa}" style="display:inline-block;background:#25D366;color:#07100a;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:700;margin-right:8px">WhatsApp</a>` : ''}<a href="mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent('Re: Tu recurso de Automia Labs')}" style="display:inline-block;background:#00d4ff;color:#071018;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:700">Responder por email</a></div>
       `),
     })
