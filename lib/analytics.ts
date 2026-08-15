@@ -9,7 +9,7 @@ type AnalyticsEvent =
   | 'contact_form_submit'
   | 'guide_download'
   | 'solution_view'
-
+  | 'diagnostic_submitted'
 export function trackEvent(event: AnalyticsEvent, payload?: Record<string, unknown>) {
   if (typeof window === 'undefined') return
 
