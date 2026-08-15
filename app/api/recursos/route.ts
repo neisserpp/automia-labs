@@ -46,13 +46,18 @@ async function sendEmail(payload: {
     }),
   })
 
-  if (!response.ok) throw new Error(`Resend: ${await response.text()}`)
+  if (!response.ok) {
+    throw new Error(`Resend: ${await response.text()}`)
+  }
+
+  return response.json()
 }
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
 
+    // Honeypot anti-spam
     if (clean(body.website_url, 100)) {
       return NextResponse.json({ ok: true })
     }
@@ -71,34 +76,28 @@ export async function POST(request: Request) {
     }
 
     const resource = resources[resourceKey]
+
     if (!resource) {
-      return NextResponse.json({ ok: false, error: 'El recurso solicitado no existe.' }, { status: 404 })
+      return NextResponse.json(
+        { ok: false, error: 'El recurso solicitado no existe.' },
+        { status: 404 },
+      )
     }
 
     const destination = process.env.LEADS_TO
-    if (!destination) throw new Error('Falta LEADS_TO en las variables de entorno.')
 
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://automialabs.com'
+    if (!destination) {
+      throw new Error('Falta LEADS_TO en las variables de entorno.')
+    }
+
+    const baseUrl =
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      'https://automia-labs-f3ztr3ozn-neffexpp-gmailcoms-projects.vercel.app'
+
     const downloadUrl = `${baseUrl}${resource.path}`
 
-    await sendEmail({
-      to: email,
-      subject: `📘 Tu recurso gratuito: ${resource.title}`,
-      html: `
-        <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827">
-          <h2>¡Aquí tienes tu recurso, ${escapeHtml(name)}!</h2>
-          <p>${escapeHtml(resource.description)}</p>
-          <p style="margin:28px 0">
-            <a href="${downloadUrl}" style="display:inline-block;padding:14px 20px;border-radius:10px;background:#00d4ff;color:#041018;text-decoration:none;font-weight:700">
-              Descargar recurso gratuito
-            </a>
-          </p>
-          <p style="font-size:13px;color:#6b7280">Si el botón no funciona, copia este enlace en tu navegador:<br>${downloadUrl}</p>
-          <p><strong>Automia Labs</strong><br>IA + automatización para negocios.</p>
-        </div>
-      `,
-    })
-
+    // 1. PRIMERO: enviamos el lead a tu Gmail.
+    // Este es el envío importante para registrar el contacto.
     await sendEmail({
       to: destination,
       subject: `🎁 Nuevo lead — ${resource.title} — ${name}`,
@@ -109,16 +108,64 @@ export async function POST(request: Request) {
           <p><strong>Email:</strong> ${escapeHtml(email)}</p>
           <p><strong>Negocio:</strong> ${escapeHtml(business)}</p>
           <p><strong>Recurso:</strong> ${escapeHtml(resource.title)}</p>
+          <p><strong>Enlace de descarga:</strong> 
+            <a href="${downloadUrl}">${downloadUrl}</a>
+          </p>
         </div>
       `,
       replyTo: email,
     })
 
-    return NextResponse.json({ ok: true })
+    // 2. DESPUÉS: intentamos enviar el recurso por email al usuario.
+    // En la cuenta de prueba de Resend este envío puede ser bloqueado.
+    // Si falla, NO hacemos fallar todo el formulario.
+    try {
+      await sendEmail({
+        to: email,
+        subject: `📘 Tu recurso gratuito: ${resource.title}`,
+        html: `
+          <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827">
+            <h2>¡Aquí tienes tu recurso, ${escapeHtml(name)}!</h2>
+            <p>${escapeHtml(resource.description)}</p>
+
+            <p style="margin:28px 0">
+              <a
+                href="${downloadUrl}"
+                style="display:inline-block;padding:14px 20px;border-radius:10px;background:#00d4ff;color:#041018;text-decoration:none;font-weight:700"
+              >
+                Descargar recurso gratuito
+              </a>
+            </p>
+
+            <p style="font-size:13px;color:#6b7280">
+              Si el botón no funciona, copia este enlace en tu navegador:<br>
+              ${downloadUrl}
+            </p>
+
+            <p>
+              <strong>Automia Labs</strong><br>
+              IA + automatización para negocios.
+            </p>
+          </div>
+        `,
+      })
+    } catch (emailError) {
+      console.warn('[api/recursos] No se pudo enviar el email al usuario:', emailError)
+    }
+
+    // El formulario se considera exitoso porque el lead sí fue registrado.
+    return NextResponse.json({
+      ok: true,
+      downloadUrl,
+    })
   } catch (error) {
     console.error('[api/recursos]', error)
+
     return NextResponse.json(
-      { ok: false, error: 'No hemos podido enviar el recurso. Inténtalo de nuevo.' },
+      {
+        ok: false,
+        error: 'No hemos podido procesar la solicitud. Inténtalo de nuevo.',
+      },
       { status: 500 },
     )
   }

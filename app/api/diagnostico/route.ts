@@ -115,36 +115,44 @@ export async function POST(request: Request) {
     `
 
     await sendEmail({
-      to: destination,
-      subject: `🚀 Nuevo diagnóstico de ${name}${company ? ` — ${company}` : ''}`,
-      html,
-      replyTo: email,
-    })
+  to: destination,
+  subject: `🚀 Nuevo diagnóstico de ${name}${company ? ` — ${company}` : ''}`,
+  html,
+  replyTo: email,
+})
 
-    await sendEmail({
-      to: email,
-      subject: 'Hemos recibido tu solicitud — Automia Labs',
-      html: `
-        <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827">
-          <h2>¡Gracias, ${escapeHtml(name)}!</h2>
-          <p>Hemos recibido tu solicitud de diagnóstico gratuito.</p>
-          <p>Vamos a revisar la información que nos has enviado y te contactaremos con oportunidades concretas de automatización para tu negocio.</p>
-          <p style="color:#6b7280">Este correo es una confirmación automática. No necesitas responderlo.</p>
-          <p><strong>Automia Labs</strong><br>IA + automatización para negocios.</p>
-        </div>
-      `,
-    })
-
-    return NextResponse.json({ ok: true })
-  } catch (error) {
-    console.error('[api/diagnostico]', error)
-    return NextResponse.json(
-      { ok: false, error: 'No hemos podido enviar la solicitud. Inténtalo de nuevo.' },
-      { status: 500 },
-    )
-  }
+// La confirmación al usuario se intenta,
+// pero no debe convertir un lead válido en error 500.
+try {
+  await sendEmail({
+    to: email,
+    subject: 'Hemos recibido tu solicitud — Automia Labs',
+    html: `
+      <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827">
+        <h2>¡Gracias, ${escapeHtml(name)}!</h2>
+        <p>Hemos recibido tu solicitud de diagnóstico gratuito.</p>
+        <p>
+          Vamos a revisar la información que nos has enviado y te contactaremos
+          con oportunidades concretas de automatización para tu negocio.
+        </p>
+        <p style="color:#6b7280">
+          Este correo es una confirmación automática.
+        </p>
+        <p>
+          <strong>Automia Labs</strong><br>
+          IA + automatización para negocios.
+        </p>
+      </div>
+    `,
+  })
+} catch (emailError) {
+  console.warn(
+    '[api/diagnostico] No se pudo enviar la confirmación al usuario:',
+    emailError,
+  )
 }
 
+return NextResponse.json({ ok: true })
 function escapeHtml(value: string) {
   return value
     .replaceAll('&', '&amp;')

@@ -11,32 +11,43 @@ type Status = 'idle' | 'loading' | 'success' | 'error'
 
 export function LeadMagnet() {
   const [status, setStatus] = useState<Status>('idle')
-
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null)
+  
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    trackEvent('lead_form_submit', { form: 'lead_magnet' })
-    setStatus('loading')
-    try {
-      const form = e.currentTarget
-      const data = Object.fromEntries(new FormData(form))
-      const response = await fetch('/api/recursos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, resource: 'guia-automatizacion' }),
-      })
+  e.preventDefault()
+  trackEvent('lead_form_submit', { form: 'lead_magnet' })
+  setStatus('loading')
 
-      const result = await response.json()
-      if (!response.ok || !result.ok) {
-        throw new Error(result.error || 'No se pudo enviar el recurso.')
-      }
+  try {
+    const form = e.currentTarget
+    const data = Object.fromEntries(new FormData(form))
 
-      trackEvent('guide_download')
-      form.reset()
-      setStatus('success')
-    } catch {
-      setStatus('error')
+    const response = await fetch('/api/recursos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...data,
+        resource: 'guia-automatizacion',
+      }),
+    })
+
+    const result = await response.json()
+
+    if (!response.ok || !result.ok) {
+      throw new Error(result.error || 'No se pudo procesar la solicitud.')
     }
+
+    if (result.downloadUrl) {
+      setDownloadUrl(result.downloadUrl)
+    }
+
+    form.reset()
+    setStatus('success')
+  } catch (error) {
+    console.error('[LeadMagnet]', error)
+    setStatus('error')
   }
+}
 
   return (
     <section id="guia" className="relative py-20 md:py-28">
@@ -58,14 +69,35 @@ export function LeadMagnet() {
             </div>
 
             {status === 'success' ? (
-              <div className="flex flex-col items-center gap-3 rounded-2xl border border-cyan/30 bg-cyan/5 p-8 text-center">
-                <CheckCircle2 className="h-10 w-10 text-cyan" />
-                <p className="font-display text-lg font-bold">¡Casi listo!</p>
-                <p className="text-sm text-muted-foreground">
-                  Te hemos enviado la guía a tu correo. Revisa también la carpeta de spam si no la ves en unos minutos.
-                </p>
-              </div>
-            ) : (
+  <div className="flex flex-col items-center gap-4 rounded-2xl border border-cyan/30 bg-cyan/5 p-8 text-center">
+    <CheckCircle2 className="h-10 w-10 text-cyan" />
+
+    <p className="font-display text-lg font-bold">
+      ¡Solicitud recibida!
+    </p>
+
+    <p className="text-sm text-muted-foreground">
+      Hemos recibido tus datos correctamente. Puedes descargar la guía ahora mismo.
+    </p>
+
+    {downloadUrl && (
+      <a
+        href={downloadUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() => trackEvent('guide_download')}
+        className="inline-flex items-center gap-2 rounded-xl bg-cyan px-5 py-3 text-sm font-bold text-slate-950 transition hover:opacity-90"
+      >
+        <Download className="h-4 w-4" />
+        Descargar guía gratuita
+      </a>
+    )}
+
+    <p className="text-xs text-muted-foreground">
+      También intentaremos enviarte una copia por correo cuando el sistema de email esté habilitado para envíos externos.
+    </p>
+  </div>
+) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1.5">
                   <FieldLabel htmlFor="lm-name">Nombre</FieldLabel>
