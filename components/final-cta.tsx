@@ -23,9 +23,9 @@ export function FinalCTA() {
                 Cuéntanos qué tarea te está haciendo perder tiempo.
               </p>
               <CTALink href="/diagnostico" size="lg" className="mt-2">
-                Hablar con Automia Labs
-                <ArrowRight className="h-4 w-4" />
-              </CTALink>
+            Hablar con Automia Labs
+          <ArrowRight className="h-4 w-4" />
+          </CTALink>
             </div>
           </div>
         </Reveal>
