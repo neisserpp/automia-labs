@@ -55,8 +55,8 @@ export function DiagnosticForm({ compact = false }: { compact?: boolean }) {
           <TextInput id="d-email" name="email" type="email" required placeholder="tucorreo@ejemplo.com" autoComplete="email" />
         </div>
         <div className="flex flex-col gap-1.5">
-          <FieldLabel htmlFor="d-company">Empresa / negocio</FieldLabel>
-          <TextInput id="d-company" name="company" required placeholder="Nombre de tu negocio" />
+          <FieldLabel htmlFor="d-company">Empresa / negocio (opcional)</FieldLabel>
+          <TextInput id="d-company" name="company" placeholder="Nombre de tu negocio" />
         </div>
         <div className="flex flex-col gap-1.5">
           <FieldLabel htmlFor="d-type">Tipo de negocio</FieldLabel>
