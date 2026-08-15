@@ -17,10 +17,21 @@ export function DiagnosticForm({ compact = false }: { compact?: boolean }) {
     trackEvent('contact_form_submit', { form: 'diagnostico' })
     setStatus('loading')
     try {
-      const data = Object.fromEntries(new FormData(e.currentTarget))
-      // MOCK SUBMISSION — reemplazar por POST a /api/diagnostico o servicio externo.
-      console.log('[v0] diagnostico submission (mock):', data)
-      await new Promise((r) => setTimeout(r, 1400))
+      const form = e.currentTarget
+      const data = Object.fromEntries(new FormData(form))
+
+      const response = await fetch('/api/diagnostico', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+
+      const result = await response.json()
+      if (!response.ok || !result.ok) {
+        throw new Error(result.error || 'No se pudo enviar el diagnóstico.')
+      }
+
+      form.reset()
       setStatus('success')
     } catch {
       setStatus('error')
@@ -33,8 +44,8 @@ export function DiagnosticForm({ compact = false }: { compact?: boolean }) {
         <CheckCircle2 className="h-12 w-12 text-cyan" />
         <h3 className="font-display text-2xl font-extrabold">¡Solicitud recibida!</h3>
         <p className="max-w-md text-sm text-muted-foreground">
-          Gracias por tu interés. Revisaremos tu negocio y te contactaremos con oportunidades
-          concretas de automatización. (Demo: todavía no se envían datos reales.)
+          Gracias por tu interés. Hemos recibido tu solicitud y te contactaremos con oportunidades
+          concretas de automatización.
         </p>
       </div>
     )
@@ -79,6 +90,14 @@ export function DiagnosticForm({ compact = false }: { compact?: boolean }) {
           <FieldLabel htmlFor="d-task">¿Qué tarea te hace perder más tiempo?</FieldLabel>
           <TextArea id="d-task" name="task" required placeholder="La tarea repetitiva que más horas te consume." />
         </div>
+        <input
+          type="text"
+          name="website_url"
+          tabIndex={-1}
+          autoComplete="off"
+          className="hidden"
+          aria-hidden="true"
+        />
         <div className="flex flex-col gap-1.5 sm:col-span-2">
           <FieldLabel htmlFor="d-budget">Presupuesto aproximado (opcional)</FieldLabel>
           <Select id="d-budget" name="budget" defaultValue="">
@@ -90,8 +109,21 @@ export function DiagnosticForm({ compact = false }: { compact?: boolean }) {
         </div>
       </div>
 
+      <label className="flex items-start gap-2.5 text-xs leading-relaxed text-muted-foreground">
+        <input
+          type="checkbox"
+          name="consent"
+          value="true"
+          required
+          className="mt-0.5 h-4 w-4 shrink-0 accent-[color:var(--brand-cyan)]"
+        />
+        <span>
+          Acepto que Automia Labs trate estos datos para gestionar mi solicitud de diagnóstico.
+        </span>
+      </label>
+
       {status === 'error' && (
-        <p className="text-sm text-destructive">Ha ocurrido un error. Inténtalo de nuevo.</p>
+        <p className="text-sm text-destructive">Ha ocurrido un error. Revisa los datos e inténtalo de nuevo.</p>
       )}
 
       <CTAButton

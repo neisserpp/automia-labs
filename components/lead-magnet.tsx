@@ -17,9 +17,21 @@ export function LeadMagnet() {
     trackEvent('lead_form_submit', { form: 'lead_magnet' })
     setStatus('loading')
     try {
-      // MOCK SUBMISSION — reemplazar por Resend / Mailchimp / Brevo / API propia.
-      await new Promise((r) => setTimeout(r, 1200))
+      const form = e.currentTarget
+      const data = Object.fromEntries(new FormData(form))
+      const response = await fetch('/api/recursos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...data, resource: 'guia-automatizacion' }),
+      })
+
+      const result = await response.json()
+      if (!response.ok || !result.ok) {
+        throw new Error(result.error || 'No se pudo enviar el recurso.')
+      }
+
       trackEvent('guide_download')
+      form.reset()
       setStatus('success')
     } catch {
       setStatus('error')
@@ -50,7 +62,7 @@ export function LeadMagnet() {
                 <CheckCircle2 className="h-10 w-10 text-cyan" />
                 <p className="font-display text-lg font-bold">¡Casi listo!</p>
                 <p className="text-sm text-muted-foreground">
-                  Recibirás la guía en tu correo. (Demo: aún no se envían datos reales.)
+                  Te hemos enviado la guía a tu correo. Revisa también la carpeta de spam si no la ves en unos minutos.
                 </p>
               </div>
             ) : (
@@ -73,12 +85,26 @@ export function LeadMagnet() {
                   </Select>
                 </div>
                 <label className="flex items-start gap-2.5 text-xs text-muted-foreground">
-                  <input type="checkbox" required className="mt-0.5 h-4 w-4 accent-[color:var(--brand-cyan)]" />
-                  Acepto recibir información relacionada con Automia Labs.
+                  <input
+                    type="checkbox"
+                    name="consent"
+                    value="true"
+                    required
+                    className="mt-0.5 h-4 w-4 accent-[color:var(--brand-cyan)]"
+                  />
+                  Acepto que Automia Labs trate estos datos para enviarme el recurso solicitado.
                 </label>
                 {status === 'error' && (
                   <p className="text-xs text-destructive">Ha ocurrido un error. Inténtalo de nuevo.</p>
                 )}
+                <input
+                  type="text"
+                  name="website_url"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  className="hidden"
+                  aria-hidden="true"
+                />
                 <CTAButton type="submit" size="lg" disabled={status === 'loading'} onClick={() => trackEvent('lead_form_start', { form: 'lead_magnet' })}>
                   {status === 'loading' ? (
                     <><Loader2 className="h-4 w-4 animate-spin" /> Enviando…</>
