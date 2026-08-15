@@ -35,9 +35,9 @@ const columns = [
 const socials = [
   { icon: Mail, href: 'mailto:hola@automialabs.com', label: 'Email' },
   { icon: LinkedinIcon, href: 'https://linkedin.com', label: 'LinkedIn' },
-  { icon: InstagramIcon, href: 'https://instagram.com/automialabs', label: 'Instagram' },
-  { icon: YoutubeIcon, href: 'https://youtube.com/@automialabs', label: 'YouTube' },
-  { icon: TiktokIcon, href: 'https://tiktok.com/@automialabs', label: 'TikTok' },
+  { icon: InstagramIcon, href: 'https://instagram.com/automialabss', label: 'Instagram' },
+  { icon: YoutubeIcon, href: 'https://youtube.com/@automialabss', label: 'YouTube' },
+  { icon: TiktokIcon, href: 'https://tiktok.com/@automialabss', label: 'TikTok' },
 ]
 
 export function Footer() {
