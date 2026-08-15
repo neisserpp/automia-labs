@@ -10,6 +10,9 @@ type AnalyticsEvent =
   | 'guide_download'
   | 'solution_view'
   | 'diagnostic_submitted'
+  | 'resource_problem_selected'
+  | 'resource_recommendation_generated'
+
 export function trackEvent(event: AnalyticsEvent, payload?: Record<string, unknown>) {
   if (typeof window === 'undefined') return
 
